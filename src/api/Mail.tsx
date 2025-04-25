@@ -1,8 +1,7 @@
 import axios from "axios";
 
-const registerUser = async (name:string, email:string, otp:string) => {
-    const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/mail/registration?name=${name}&email=${email}&otp=${otp}`;
-    console.log(url)
+const registerUser = async (token: string, otp:string) => {
+    const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/mail/registration?token=${token}&otp=${otp}`;
     const res = await axios.get(url);
     return res.data
 }

@@ -3,8 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { createUser } from "../api/User.tsx";
 import styled from "styled-components";
 
-let name
-let email
+let token
 export default function Registration() {
     const [searchParams] = useSearchParams();
     const [password, setPassword] = useState("");
@@ -12,8 +11,7 @@ export default function Registration() {
     const navigate = useNavigate();
 
     useEffect(() => {
-            name = searchParams.get('name');
-            email = searchParams.get('email')
+            token = searchParams.get('token');
         })
 
     const onClickSendPassword = async() => {
@@ -22,7 +20,7 @@ export default function Registration() {
             return
         }
         if (password === password2){
-            const res = await createUser(name, email, password)
+            const res = await createUser(token, password)
             if (res){
                     alert("登録できました！")
             }

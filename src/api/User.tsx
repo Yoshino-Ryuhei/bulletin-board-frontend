@@ -6,9 +6,9 @@ const getUser = async (user_id: number, token: string) => {
     return res.data;
 };
 
-const createUser = async (name: string, email: string, password: string) => {
-    const param = {name: name, email: email, password: password}
-    const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/user`;
+const createUser = async (token:string , password: string) => {
+    const param = {password: password}
+    const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/user?token=${token}`;
     const options = {
         method: "POST",
         url: url,
