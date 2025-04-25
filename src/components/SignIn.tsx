@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import { UserContext } from '../providers/UserProvider.tsx';
 import styled from 'styled-components';
 import { getUser } from '../api/User.tsx';
+import { getIconURL } from '../api/UserIcon.tsx';
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -14,13 +15,18 @@ export default function SignIn() {
     const onSignInClick = async () => {
         const ret = await sign_in(userId, pass);
         const user = await getUser(ret.user_id, ret.token);
+        let icon_url = user.icon_url
+        if(user.icon_url){
+            icon_url = await getIconURL(ret.user_id, ret.token);
+        }else{
+        }
         if (ret && ret.token) {
             // setUserInfoを使用してコンテキストにユーザー情報を保持する
             setUserInfo({
                 id: ret.user_id,
                 token: ret.token,
                 email: user.email,
-                icon: user.icon_url
+                icon: icon_url
             });
             navigate('/main')
         }

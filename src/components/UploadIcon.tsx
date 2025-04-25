@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { uploadUserIcon } from '../api/UserIcon.tsx';
+import { getIconURL, uploadUserIcon } from '../api/UserIcon.tsx';
 import Header from './Header.tsx';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../providers/UserProvider.tsx';
@@ -27,13 +27,14 @@ const UploadIcon: React.FC = () => {
     formData.append('file', file);
 
     const res = await uploadUserIcon(userInfo.id, userInfo.token, formData)
+    const icon_url = await getIconURL(userInfo.id, userInfo.token)
       alert("アップロードしました！")
       setUploadedUrl(res.data.imageUrl);
       setUserInfo({
         id: userInfo.id,
         token: userInfo.token,
         email: userInfo.email,
-        icon: res.data.imageUrl
+        icon: icon_url
     })
   };
 

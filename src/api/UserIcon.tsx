@@ -15,4 +15,13 @@ const uploadUserIcon = async (user_id: number, token: string, formData: FormData
     return res
 }
 
-export {uploadUserIcon}
+const getIconURL = async (user_id: number, token: string) => {
+  const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/user-icon/${user_id}?token=${token}`;
+  console.log(url)
+  const res = await axios.get<{ imageUrl: string }>(url)
+  console.log(res.data)
+  return res.data
+}
+
+
+export {uploadUserIcon, getIconURL}
