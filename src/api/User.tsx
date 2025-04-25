@@ -32,4 +32,17 @@ const updateUser = async (name: string, email: string, password: string, user_id
     return res.data
 }
 
-export { getUser, createUser, updateUser };
+const resetPassUser = async (name: string, email: string, password: string) => {
+    const param = {name: name, email: email, password: password}
+    const url = `${process.env.REACT_APP_BACKEND_DOMAIN}` + `/user`;
+    const options = {
+        method: "PUT",
+        url: url,
+        headers: {"Content-Type": "application/json"},
+        data: param,
+    }
+    const res = await axios(options);
+    return res.data
+}
+
+export { getUser, createUser, updateUser, resetPassUser };

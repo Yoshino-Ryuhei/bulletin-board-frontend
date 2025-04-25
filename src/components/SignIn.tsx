@@ -57,6 +57,9 @@ export default function SignIn() {
                 Sign Up
             </SLoginButton>
         </SSignInRow>
+        <SLoginButton type="button" onClick={() => navigate("/resetpass")}>
+                パスワード忘れた方
+        </SLoginButton>
     </SSignInFrame>
     )
 }
