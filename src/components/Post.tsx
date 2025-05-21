@@ -18,8 +18,8 @@ export default function Post(props: any) {
         return `${year}年${month}月${date}日 ${hour}時${min}分${sec}秒`;
     }
 
-    const onClickDelete = async (line: string) => {
-        await deletePost(userInfo.token, line)
+    const onClickDelete = async (id: number) => {
+        await deletePost(userInfo.token, id)
         const posts = await getList(userInfo.token, start)
         // getListで取得したポスト配列をコンテキストに保存する
         let postList: Array<PostType> = [];
@@ -36,18 +36,21 @@ export default function Post(props: any) {
         setPostList([...postList])
     }
     
-    const getLines = (src: string):ReactNode => {
-        return src.split("\n").map((line, index) => {
-            return (
+    const getLines = (post: PostType):ReactNode => {
+        const lines = post.content.split('\n');
+        return (
+            <React.Fragment>
+            {lines.map((line, index) => (
                 <React.Fragment key={index}>
                     {line}
                     <br />
-                    <SRightItem>
-                        <SDeleteButton onClick={() => onClickDelete(line)}>Delete </SDeleteButton>
-                    </SRightItem>
                 </React.Fragment>
-            )
-        })
+            ))}
+            <SRightItem>
+                <SDeleteButton onClick={() => onClickDelete(post.id)}>Delete</SDeleteButton>
+            </SRightItem>
+        </React.Fragment>
+        )
     }
 
     return(
@@ -57,7 +60,7 @@ export default function Post(props: any) {
                     <SName>{post.user_name}</SName>
                     <SDate>{getDateStr(post.created_at)}</SDate>
                 </div>
-                <div>{getLines(post.content)}</div>
+                <div>{getLines(post)}</div>
             </SPost>
         </>
     )
