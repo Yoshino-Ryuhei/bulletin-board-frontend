@@ -36,8 +36,8 @@ const updateUser = async (name: string, email: string, password: string, user_id
     return res.data
 }
 
-const resetPassUser = async (name: string, email: string, password: string) => {
-    const param = {name: name, email: email, password: password}
+const resetPassUser = async (name: string, email: string, password: string, hidden_token) => {
+    const param = {name: name, email: email, password: password, hidden_token: hidden_token}
     const url = `${process.env.REACT_APP_BACKEND_DOMAIN}` + `/user`;
     const options = {
         method: "PUT",

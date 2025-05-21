@@ -25,8 +25,8 @@ const getList = async (token: string, start: number = 0, records: number = 10, s
     return res.data;
 }
 
-const deletePost = async (token: string, msg: string) => {
-    const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/post?message=${msg}`;
+const deletePost = async (token: string, id: number) => {
+    const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/post?id=${id}`;
     const res = await axios.delete(url, {
         headers: {
             Authorization: `Bearer ${token}`

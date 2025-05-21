@@ -13,7 +13,7 @@ export default function ResetPassPage() {
 
     useEffect(() => {
             name = searchParams.get('name');
-            email = searchParams.get('email')
+            email = searchParams.get('email');
         })
 
     const onClickSendPassword = async() => {
@@ -22,7 +22,7 @@ export default function ResetPassPage() {
             return
         }
         if (password === password2){
-            const res = await resetPassUser(name, email, password)
+            const res = await resetPassUser(name, email, password, process.env.REACT_APP_RESET_PASS_TOKEN)
             if (res){
                     alert("登録できました！")
             }

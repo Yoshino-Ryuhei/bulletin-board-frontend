@@ -33,6 +33,7 @@ export default function SideBar() {
                 })
             })
         }
+        console.log(postList)
         setPostList(postList);
     }
 
@@ -56,17 +57,34 @@ export default function SideBar() {
 
 const SSideBar = styled.div`
     padding: 8px;
+    width: 100%;
+
+    @media (max-width: 599px) {
+        width: 80%;
+    }
 `;
 
 const SSideBarRow = styled.div`
     margin-top: 4px;
     margin-bottom: 4px;
     text-align: left;
+    width: 90%;
+    overflow-wrap: anywhere;
+
+    @media (max-width: 599px) {
+        width: 80%;
+        font-size: 80%;
+    }
 `;
 
 const SSideBarTextArea = styled.textarea`
     border-radius: 4px;
     border-shadow: inset 0 2px 4px #CCCCCC;
+    width: 90%;
+
+    @media (max-width: 599px) {
+        width: 80%;
+    }
 `;
 
 const SSideBarButton = styled.button`
@@ -74,11 +92,21 @@ const SSideBarButton = styled.button`
     padding: 4px;
     border-radius: 8px;
     color: #FAFAFA;
-    width: 100%;
+    width: 90%;
+
+    @media (max-width: 599px) {
+        width: 80%;
+        font-size: 80%;
+    }
 `;
 
 const SSideBarUserIcon = styled.img`
-    width: 150px;
-    hight: 200px;
     border-radius: 100px;
+    height: 100px;
+    width: 100px;
+
+    @media (max-width: 599px) {
+        height: 50px;
+        width: 50px;
+    }
 `;
