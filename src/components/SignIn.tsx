@@ -31,7 +31,6 @@ export default function SignIn() {
         let icon_url = user.icon_url
         if(user.icon_url){
             icon_url = await getIconURL(ret.user_id, ret.token);
-        }else{
         }
         if (ret && ret.token) {
             // setUserInfoを使用してコンテキストにユーザー情報を保持する

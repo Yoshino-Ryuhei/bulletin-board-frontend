@@ -72,6 +72,7 @@ export default function ResetPassPage() {
 
 const SRegistrationInput = styled.input`
     width: 20%;
+    min-width: 8em;
     height: 36%;
     border-width: 0 0 2px 0;
     border-color: #000;
@@ -106,5 +107,6 @@ const SRegistrationButton = styled.button`
     margin-left: 5px; 
     border-radius: 8px;
     color: #FAFAFA;
-    width: 20%
+    width: 20%;
+    min-width: 8em;
 `;

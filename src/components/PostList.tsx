@@ -5,6 +5,7 @@ import { UserContext } from '../providers/UserProvider.tsx';
 import { getList } from '../api/Post.tsx';
 import styled from 'styled-components';
 import { getIconURL } from '../api/UserIcon.tsx';
+import axios from 'axios';
 
 export default function PostList() {
     // ポストリストコンテキスト、ユーザーコンテキストを使用する
@@ -19,11 +20,23 @@ export default function PostList() {
         let postList: Array<PostType> = [];
         if (posts) {
             for (const p of posts) {
-                const userIcon = await getIconURL(p.user_id, userInfo.token);
+                let icon_url
+                try {
+                    icon_url = await getIconURL(p.user_id, userInfo.token);
+                }
+                catch(err) {
+                    if (axios.isAxiosError(err) && err.response?.status === 500){
+                        icon_url = undefined
+                    }
+                    else{
+                        alert(err)
+                        return
+                    }
+                }
                  postList.push({
                     id: p.id,
                     user_name: p.user_name,
-                    user_icon: userIcon,
+                    user_icon: icon_url,
                     content: p.content,
                     created_at: new Date(p.created_at),
                 });

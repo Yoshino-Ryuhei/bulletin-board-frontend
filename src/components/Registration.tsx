@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { createUser } from "../api/User.tsx";
 import styled from "styled-components";
+import axios from "axios";
 
 let token
 export default function Registration() {
@@ -20,10 +21,23 @@ export default function Registration() {
             return
         }
         if (password === password2){
-            const res = await createUser(token, password)
-            if (res){
-                    alert("登録できました！")
+            let res
+            try {
+                res = await createUser(token, password)
             }
+            catch(err) {
+                if (axios.isAxiosError(err) && err.response?.status === 404){
+                    alert("あなただれ？")
+                }
+                else if (axios.isAxiosError(err) && err.response?.status === 409){
+                    alert("このメールアドレスはすでに使われています")
+                }
+                else{
+                    alert(err)
+                }
+                return
+            }
+            alert("登録できました！")
         }else{
             alert("二つのパスワードは違います。もう一度パスワードを確認してください")
         }
