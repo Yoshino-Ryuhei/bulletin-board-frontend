@@ -4,6 +4,7 @@ import { PostListContext, PostType } from '../providers/PostListProvider.tsx';
 import { UserContext } from '../providers/UserProvider.tsx';
 import { getList } from '../api/Post.tsx';
 import styled from 'styled-components';
+import { getIconURL } from '../api/UserIcon.tsx';
 
 export default function PostList() {
     // ポストリストコンテキスト、ユーザーコンテキストを使用する
@@ -12,24 +13,26 @@ export default function PostList() {
     const [searchWord, setSearchWord] = useState("");
 
     const getPostList = async() => {
-        const posts = await getList(userInfo.token, start, 10, String(searchWord))
+        const posts = await getList(userInfo.token, start, 10, searchWord)
 
         // getListで取得したポスト配列をコンテキストに保存する
         let postList: Array<PostType> = [];
         if (posts) {
-            posts.forEach((p:any) => {
-                postList.push({
+            for (const p of posts) {
+                const userIcon = await getIconURL(p.user_id, userInfo.token);
+                 postList.push({
                     id: p.id,
                     user_name: p.user_name,
+                    user_icon: userIcon,
                     content: p.content,
                     created_at: new Date(p.created_at),
-                })
-            })
+                });
+            }
         }
         setPostList(postList);
     }
 
-    const onClickFollowTenPostList = () => {
+    const onClickBackTenPostList = () => {
         if (start - 10 >= 0){
             setStart(start - 10);
         }
@@ -52,7 +55,11 @@ export default function PostList() {
     return (
         <>
         <SPostList>
-            <p>PostList  <span>{start+1}~{start+postList.length}件</span></p>
+            <div>PostList  <span>{start+1}~{start+postList.length}件</span></div>
+            <SPostListButton onClick={()=> onClickBackTenPostList()}>&lt;</SPostListButton>
+            <SPostListButton onClick={()=> getPostList()}>↺</SPostListButton>
+            <SPostListButton onClick={()=> onClickNextTenPostList()}>&gt;</SPostListButton>
+            <br></br>
             <label>検索</label>
             <input value={searchWord} type="text" onChange={(evt) => {setSearchWord(evt.target.value);setStart(0);}}></input>
             {postList.map((p) => (
@@ -61,9 +68,6 @@ export default function PostList() {
                 </>
             ))}
         </SPostList>
-        <SPostListButton onClick={()=> onClickFollowTenPostList()}>Follow</SPostListButton>
-        <SPostListButton onClick={()=> getPostList()}>Reload</SPostListButton>
-        <SPostListButton onClick={()=> onClickNextTenPostList()}>Next</SPostListButton>
         </>
     )
 }
@@ -84,4 +88,13 @@ const SPostListButton = styled.button`
     border-radius: 8px;
     color: #FAFAFA;
     width: 10%;
+    font-size: 12px;
+
+    @media (min-width: 600px) {
+        width: 50px;
+    }
+
+    @media (min-width: 600px) {
+        width: 50px;
+    }
 `;

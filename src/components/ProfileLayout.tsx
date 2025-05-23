@@ -42,25 +42,27 @@ export default function ProfileLayout()  {
 
 const SProfileLayout  = styled.div`
     width: 100%;
-    hight: 100%;
+    height: 100%;
     justify-content: center;
 `;
 
 const SProfileLayoutUserIcon = styled.img`
-    width: 150px;
-    hight: 200px;
     border-radius: 100px;
+
+    @media (max-width: 599px) {
+        width: 120px;
+    }
 `;
 
 const SProfileLayoutUserName = styled.span`
     width: 100%;
-    hight: 100%;
+    height: 100%;
     display: block;
 `;
 
 const SProfileLayoutUserEmail = styled.span`
     width: 100%;
-    hight: 100%;
+    height: 100%;
     display: block;
 `;
 
@@ -75,5 +77,10 @@ const SProfileLayoutButton = styled.button`
     margin-left: 5px; 
     border-radius: 8px;
     color: #FAFAFA;
-    width: 10%
+    width: 10em;
+
+    @media (max-width: 599px) {
+        width: 9em;
+        font-size: 80%;
+    }
 `;

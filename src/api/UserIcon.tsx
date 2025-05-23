@@ -2,7 +2,7 @@ import axios from "axios";
 
 const uploadUserIcon = async (user_id: number, token: string, formData: FormData) => {
     const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/user-icon/${user_id}`;
-    const res = await axios.post<{ imageUrl: string }>(
+    const res = await axios.post(
         url,
         formData,
         {
@@ -18,7 +18,7 @@ const uploadUserIcon = async (user_id: number, token: string, formData: FormData
 
 const getIconURL = async (user_id: number, token: string) => {
   const url = `${process.env.REACT_APP_BACKEND_DOMAIN}`+`/user-icon/${user_id}`;
-  const res = await axios.get<{ imageUrl: string }>(url,{
+  const res = await axios.get(url,{
     headers: {
         Authorization: `Bearer ${token}`
     }

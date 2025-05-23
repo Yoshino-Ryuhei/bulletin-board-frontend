@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { getList, post } from '../api/Post.tsx';
 import { PostListContext, PostType } from '../providers/PostListProvider.tsx';
 import userIconSample from "../images/user_icon_sample.jpg";
+import { getIconURL } from '../api/UserIcon.tsx';
 
 export default function SideBar() {
     const [msg, setMsg] = useState("");
@@ -24,16 +25,17 @@ export default function SideBar() {
         // getListで取得したポスト配列をコンテキストに保存する
         let postList: Array<PostType> = [];
         if (posts) {
-            posts.forEach((p:any) => {
+            for (const p of posts) {
+                const userIcon = await getIconURL(p.user_id, userInfo.token);
                 postList.push({
                     id: p.id,
                     user_name: p.user_name,
+                    user_icon: userIcon,
                     content: p.content,
                     created_at: new Date(p.created_at),
-                })
-            })
+                });
+            }
         }
-        console.log(postList)
         setPostList(postList);
     }
 
@@ -72,7 +74,6 @@ const SSideBarRow = styled.div`
     overflow-wrap: anywhere;
 
     @media (max-width: 599px) {
-        width: 80%;
         font-size: 80%;
     }
 `;
@@ -95,8 +96,7 @@ const SSideBarButton = styled.button`
     width: 90%;
 
     @media (max-width: 599px) {
-        width: 80%;
-        font-size: 80%;
+        font-size: 90%;
     }
 `;
 

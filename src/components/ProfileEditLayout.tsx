@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../providers/UserProvider.tsx";
 import { updateUser } from "../api/User.tsx";
 import styled from "styled-components";
+import { sendUpdateMail } from "../api/Mail.tsx";
+import { sign_in } from "../api/Auth.tsx";
+import axios from "axios";
 
 export default function ProfileEditLayout() {
     const navigate = useNavigate();
@@ -22,11 +25,34 @@ export default function ProfileEditLayout() {
             alert("入力された２つのパスワードが違います")
             return
         }
-        const res = await updateUser(userName, userEmail, userPass, userInfo.id, userInfo.token)
-        if(!res){
+
+        let confirm = window.confirm("本当に更新しますか？")
+        if (!confirm){
             return
         }
-        setUserInfo({id: userInfo.id, token: userInfo.token, email: userEmail})
+
+        try {
+            await sendUpdateMail(userName,userEmail)
+        } catch (e) {
+            alert("有効なメールアドレスを入力してください")
+            return
+        }
+        await updateUser(userName, userEmail, userPass, userInfo.id, userInfo.token)
+        let ret
+        try {
+            ret = await sign_in(userName, userPass);
+        }
+        catch(err) {
+            if (axios.isAxiosError(err) && err.response?.status === 401){
+                alert("ユーザーネーム・パスワード・メールアドレスのいずれかが違います。")
+            }
+            else{
+                alert(err)
+            }
+            return
+        }
+        alert("更新できました!")
+        setUserInfo({id: ret.user_id, token: ret.token, email: userEmail, icon: userInfo.icon})
     }
 
     return (
@@ -38,15 +64,15 @@ export default function ProfileEditLayout() {
                 </SProfileEditForm>
                 <SProfileEditForm>
                     <SProfileEditLabel>PassWord</SProfileEditLabel>
-                    <SProfileEditInput id="passWord" value={userPass} type="password" onChange={(evt) => setUserPass(evt.target.value)} />
+                    <SProfileEditInput id="editPassWord" value={userPass} type="password" onChange={(evt) => setUserPass(evt.target.value)} />
                 </SProfileEditForm>
                 <SProfileEditForm>
                     <SProfileEditLabel>InputAgain</SProfileEditLabel>
-                    <SProfileEditInput id="passWord" value={userPass2} type="password" onChange={(evt) => setUserPass2(evt.target.value)} />
+                    <SProfileEditInput id="editPassWord2" value={userPass2} type="password" onChange={(evt) => setUserPass2(evt.target.value)} />
                 </SProfileEditForm>
                 <SProfileEditForm>
                     <SProfileEditLabel>Email</SProfileEditLabel>
-                    <SProfileEditInput id="email" value={userEmail} type="text" placeholder=" " onChange={(evt) => setUserEmail(evt.target.value)} />
+                    <SProfileEditInput id="editEmail" value={userEmail} type="text" placeholder=" " onChange={(evt) => setUserEmail(evt.target.value)} />
                 </SProfileEditForm>
                 <SProfileEditButton onClick={async() => {await onClickUpdateUser();}}>ユーザー情報を更新する</SProfileEditButton>
             </>
@@ -61,11 +87,13 @@ const SProfileEditButton = styled.button`
     margin-left: 5px; 
     border-radius: 8px;
     color: #FAFAFA;
-    width: 20%
+    width: 20%;
+    min-width: 12em;
 `;
 
 const SProfileEditInput = styled.input`
     width: 20%;
+    min-width: 10em;
     height: 36%;
     border-width: 0 0 2px 0;
     border-color: #000;

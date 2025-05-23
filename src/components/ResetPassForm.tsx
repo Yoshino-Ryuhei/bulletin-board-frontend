@@ -2,24 +2,36 @@ import React, {useState} from "react"
 import { useNavigate } from "react-router-dom"
 import { sendResetPasstMail } from "../api/Mail.tsx"
 import styled from "styled-components"
+import axios from "axios"
 
 export default function ResetPassForm() {
-    const [sendEmail, setSendEmail] = useState(false)
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const navigate = useNavigate();
 
     const onResetPassClick = async () => {
-        const res = await sendResetPasstMail(name, email)
-        if(res){
-            setSendEmail(true);
+        let res
+        try {
+            res = await sendResetPasstMail(name, email)
         }
+        catch(err) {
+            if (axios.isAxiosError(err) && err.response?.status === 404){
+                alert("ユーザーネームとパスワードをもう一度確かめてください。")
+            }
+            else {
+                alert(err)
+            }
+            return
+        }
+        alert("メールが送信されました!")
     }
 
     return (
         <SResetPassFrame>
             <SResetPassTitle>Reset Password</SResetPassTitle>
-            <SResetPassSubTitle>以前登録した名前とメールアドレスを入力してください</SResetPassSubTitle>
+            <SResetPassSubTitle>ユーザーネームと</SResetPassSubTitle>
+            <SResetPassSubTitle>メールアドレスを</SResetPassSubTitle>
+            <SResetPassSubTitle>入力してください</SResetPassSubTitle>
             <SResetPassForm>
                 <SResetPassLabel htmlFor="name">Name</SResetPassLabel>
                 <SResetPassInput id="name" value={name} type="text" onChange={(evt)=>setName(evt.target.value)} />
@@ -34,7 +46,6 @@ export default function ResetPassForm() {
             <SResetPassForm>
                 <SResetPassButton type="button" onClick={() => navigate("/")}>Login</SResetPassButton>
             </SResetPassForm>
-            {sendEmail ? <div>メールを送信しました</div>:<></>}
         </SResetPassFrame>
     )
 }
@@ -50,6 +61,7 @@ box-shadow: 0 8px 8px #aaaaaa;
 
 const SResetPassInput = styled.input`
     width: 20%;
+    min-width: 10em;
     height: 36%;
     border-width: 0 0 2px 0;
     border-color: #000;
@@ -86,7 +98,8 @@ const SResetPassButton = styled.button`
     margin-left: 5px; 
     border-radius: 8px;
     color: #FAFAFA;
-    width: 20%
+    width: 20%;
+    min-width: 12em;
 `;
 
 const SResetPassTitle = styled.h1`
@@ -98,7 +111,8 @@ const SResetPassTitle = styled.h1`
 
 const SResetPassSubTitle = styled.h3`
     font-family: Lusitana, serif;
-    font-size: 17px;
+    font-size: 15px;
     line-height: 26px;
     font-weight: 400;
+    margin: 5px;
 `;

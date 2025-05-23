@@ -12,6 +12,13 @@ const UploadIcon: React.FC = () => {
   const { userInfo, setUserInfo } = useContext(UserContext);
   const navigate = useNavigate();
 
+  const onClickUplodaFile = () => {
+    const fileElem = document.getElementById("fileElem");
+    if (fileElem) {
+      fileElem.click();
+    }
+  }
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -44,8 +51,9 @@ const UploadIcon: React.FC = () => {
       {userInfo.icon ? <><label>今までのユーザーアイコン</label><SUploadUserIcon src={userInfo.icon} alt={"ユーザーアイコン"}></SUploadUserIcon></> : <></>}
         
       <div>
-        <SUploadInput type="file" accept="image/*" onChange={handleFileChange} />
-        {preview && <SUploadUserIcon src={preview} alt="preview" width={100} />}
+        <SUploadInput id="fileElem" type="file" accept="image/*" onChange={handleFileChange} /><SUploadButton onClick={()=>onClickUplodaFile()}>画像を選択</SUploadButton>
+        {preview && <SUploadUserIcon src={preview} alt="preview"/>}
+        <br></br>
         <SUploadButton onClick={handleUpload}>アップロード</SUploadButton>
         {uploadedUrl && <p>アップロード成功</p>}
       </div>
@@ -63,19 +71,22 @@ const SUploadButton = styled.button`
     margin-left: 5px; 
     border-radius: 8px;
     color: #FAFAFA;
-    width: 20%
+    width: 8em;
 `;
 
 const SUploadUserIcon = styled.img`
-    width: 150px;
-    hight: 200px;
     border-radius: 100px;
+
+    @media (max-width: 599px) {
+        width: 100px;
+    }
 `;
 
 const SUploadInput = styled.input`
   padding: 4px;
   margin-top: 10px;
-  margin-left: 5px; 
+  margin-left: 5px;
+  display:none;
 
   &::file-selector-button{
     background-color: #222222;

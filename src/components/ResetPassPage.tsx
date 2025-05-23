@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { resetPassUser } from "../api/User.tsx";
 import styled from "styled-components";
+import axios from "axios";
 
 let name
 let email
@@ -21,10 +22,27 @@ export default function ResetPassPage() {
             alert("入力を行ってください")
             return
         }
+        let confirm = window.confirm("本当にパスワードをリセットしますか？");
+        if (!confirm){
+            return
+        }
         if (password === password2){
-            const res = await resetPassUser(name, email, password, process.env.REACT_APP_RESET_PASS_TOKEN)
-            if (res){
-                    alert("登録できました！")
+            let res
+            try {
+                res = await resetPassUser(name, email, password, process.env.REACT_APP_RESET_PASS_TOKEN)
+                alert("登録できました！")
+            }
+            catch(err) {
+                if (axios.isAxiosError(err) && err.response?.status === 401){
+                    alert("パスワードリセットの有効期限が切れています。")
+                }
+                else if(axios.isAxiosError(err) && err.response?.status === 404){
+                    alert("あなたは誰ですか？")
+                }
+                else {
+                    alert(err)
+                }
+                return
             }
         }else{
             alert("二つのパスワードは違います。もう一度パスワードを確認してください")

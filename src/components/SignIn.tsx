@@ -5,6 +5,7 @@ import { UserContext } from '../providers/UserProvider.tsx';
 import styled from 'styled-components';
 import { getUser } from '../api/User.tsx';
 import { getIconURL } from '../api/UserIcon.tsx';
+import axios from 'axios';
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -13,7 +14,19 @@ export default function SignIn() {
     const { setUserInfo } = useContext(UserContext);
 
     const onSignInClick = async () => {
-        const ret = await sign_in(userId, pass);
+        let ret
+        try {
+            ret = await sign_in(userId, pass);
+        }
+        catch(err) {
+            if (axios.isAxiosError(err) && err.response?.status === 401){
+                alert("ユーザーネームとパスワードのどちらかまたは両方違います。")
+            }
+            else{
+                alert(err)
+            }
+            return
+        }
         const user = await getUser(ret.user_id, ret.token);
         let icon_url = user.icon_url
         if(user.icon_url){
@@ -42,6 +55,7 @@ export default function SignIn() {
                 <input id="id" value={userId} type="text" onChange={(evt)=>setUserId(evt.target.value)} />
             </SSignInInput>
         </SSignInRow>
+        <br></br>
         
         <SSignInRow>
             <SSignInLabel>
@@ -52,6 +66,7 @@ export default function SignIn() {
             </SSignInInput>
         </SSignInRow>
 
+        <br></br>
         <SSignInRow>
             <SLoginButton type="button" onClick={onSignInClick}>
                 Login
@@ -63,9 +78,13 @@ export default function SignIn() {
                 Sign Up
             </SLoginButton>
         </SSignInRow>
-        <SLoginButton type="button" onClick={() => navigate("/resetpass")}>
-                パスワード忘れた方
-        </SLoginButton>
+
+        <br></br>
+        <SSignInRow>
+            <SLoginButton type="button" onClick={() => navigate("/resetpass")}>
+                    パスワードを忘れた方
+            </SLoginButton>
+        </SSignInRow>
     </SSignInFrame>
     )
 }
@@ -87,10 +106,14 @@ const SSignInRow = styled.div`
 
 const SSignInLabel = styled.span`
     display: inline-block;
-    width: 25%;
+    width: 100px;
     vertical-align: top;
-    text-align: right;
+    text-align: left;
     margin-right: 4px;
+
+    @media (max-width: 449px) {
+        text-align: center;
+    }
 `;
 
 const SSignInInput = styled.span`
@@ -98,11 +121,14 @@ const SSignInInput = styled.span`
     width: auto;
     vertical-align: top;
     margin-left: 4px;
+    margin-right: 4px;
 `;
 
 const SLoginButton = styled.button`
     background-color: #444444;
     color: #f0f0f0;
     padding: 4px 16px;
+    margin: 4px;
     border-radius: 8px;
+    font-size: 12px;
 `;

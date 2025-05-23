@@ -40,6 +40,6 @@ const SSideBar = styled.div`
     height: 100%;
 `
 const SContents = styled.div`
-    width: 100%;
+    width: 70%;
     height: 100%;
 `
