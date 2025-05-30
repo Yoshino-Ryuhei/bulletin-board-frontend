@@ -61,6 +61,9 @@ export default function PostList() {
     useEffect(() => {
         async function asyncGetPostList() {
             await getPostList();
+            // setTimeout(async() => {
+            //     await asyncGetPostList();
+            // },10000)
         }
         asyncGetPostList();
     }, [start, searchWord])

@@ -1,55 +1,65 @@
-import React, {useState, useContext } from 'react';
+import React, {useState, useContext, useEffect } from 'react';
 import { UserContext } from '../providers/UserProvider.tsx';
 import styled from 'styled-components';
 import { getList, post } from '../api/Post.tsx';
 import { PostListContext, PostType } from '../providers/PostListProvider.tsx';
 import userIconSample from "../images/user_icon_sample.jpg";
+import { io } from "socket.io-client";
 import { getIconURL } from '../api/UserIcon.tsx';
 import axios from 'axios';
+
+const socket = io(process.env.REACT_APP_WEBSOCKET_DOMAIN);
 
 export default function SideBar() {
     const [msg, setMsg] = useState("");
     const {postList, setPostList, start, setStart} = useContext(PostListContext);
     const { userInfo } = useContext(UserContext);
+
+    const submit = (post: PostType) => {
+        socket.emit("new_post", post);
+    }
+
     const onSendClick = async() => {
         if (msg === ""){
             alert("入力してください");
             return
         }
-        new Promise(async(resolve)=>{await post(String(userInfo.id), userInfo.token, String(msg));resolve("");}).then(async() =>{getPostList();});
+        new Promise<PostType>(async(resolve)=>{
+            const newPost = await post(String(userInfo.id), userInfo.token, String(msg));
+            console.log(newPost);
+            resolve(newPost);})
+        .then((newPost) =>{
+            submit(newPost);
+        });
     }
 
-    const getPostList = async() => {
-        const posts = await getList(userInfo.token, start)
-
-        // getListで取得したポスト配列をコンテキストに保存する
-        let postList: Array<PostType> = [];
-        if (posts) {
-            for (const p of posts) {
-                let icon_url
-                try {
-                    icon_url = await getIconURL(p.user_id, userInfo.token);
-                }
-                catch(err) {
-                    if (axios.isAxiosError(err) && err.response?.status === 500){
-                        icon_url = undefined
-                    }
-                    else{
-                        alert(err)
-                        return
-                    }
-                }
-                postList.push({
-                    id: p.id,
-                    user_name: p.user_name,
-                    user_icon: icon_url,
-                    content: p.content,
-                    created_at: new Date(p.created_at),
-                });
+    useEffect(() => {
+        const sendWebSocketPost = async (post) => {
+            post.created_at = new Date(post.created_at);
+            let icon_url
+            try {
+                icon_url = await getIconURL(post.user_id, userInfo.token);
             }
+            catch(err) {
+                if (axios.isAxiosError(err) && err.response?.status === 500){
+                    icon_url = undefined
+                }
+                else{
+                    alert(err)
+                    return
+                }
+            }
+            post.user_icon = icon_url;
+            setPostList(prev => [post, ...prev])
         }
-        setPostList(postList);
-    }
+        socket.on("new_post", async(post) => {
+            await sendWebSocketPost(post);
+        })
+
+        return () => {
+            socket.off("new_post");
+        }
+    }, [])
 
     return (
         <SSideBar>
