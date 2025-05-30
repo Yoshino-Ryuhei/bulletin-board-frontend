@@ -26,7 +26,6 @@ export default function SideBar() {
         }
         new Promise<PostType>(async(resolve)=>{
             const newPost = await post(String(userInfo.id), userInfo.token, String(msg));
-            console.log(newPost);
             resolve(newPost);})
         .then((newPost) =>{
             submit(newPost);

@@ -39,7 +39,6 @@ export default function Post(props: any) {
                         return
                     }
                 }
-                console.log(postList);
                 postList.push({
                     id: p.id,
                     user_name: p.user_name,
