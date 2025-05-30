@@ -8,7 +8,7 @@ import { io } from "socket.io-client";
 import { getIconURL } from '../api/UserIcon.tsx';
 import axios from 'axios';
 
-const socket = io(process.env.REACT_APP_WEBSOCKET_DOMAIN);
+const socket = io(process.env.REACT_APP_WEBSOCKET_DOMAIN, {transports: ['websocket']});
 
 export default function SideBar() {
     const [msg, setMsg] = useState("");
