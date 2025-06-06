@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 const UploadIcon: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [isUplaod, setIsUpload] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const { userInfo, setUserInfo } = useContext(UserContext);
@@ -33,9 +34,16 @@ const UploadIcon: React.FC = () => {
     const formData = new FormData();
     formData.append('file', file);
 
+    setIsUpload(true);
     const res = await uploadUserIcon(userInfo.id, userInfo.token, formData)
+    console.log(res)
+    if (!res){
+      alert("アップロードできませんでした...");
+      setIsUpload(false);
+      return
+    }
+    alert("アップロードしました！")
     const icon_url = await getIconURL(userInfo.id, userInfo.token)
-      alert("アップロードしました！")
       setUploadedUrl(res.data.imageUrl);
       setUserInfo({
         id: userInfo.id,
@@ -43,6 +51,7 @@ const UploadIcon: React.FC = () => {
         email: userInfo.email,
         icon: icon_url
     })
+    setIsUpload(false);
   };
 
   return (
@@ -54,8 +63,9 @@ const UploadIcon: React.FC = () => {
         
       <div>
         <SUploadInput id="fileElem" type="file" accept="image/*" onChange={handleFileChange} /><SUploadButton onClick={()=>onClickUplodaFile()}>画像を選択</SUploadButton>
-         <br></br>
+        <br></br>
         <SUploadButton onClick={handleUpload}>アップロード</SUploadButton>
+        {isUplaod ? <LoadingSpinner></LoadingSpinner>:<></>}
         {uploadedUrl && <p>アップロード成功</p>}
       </div>
       <SUploadButton type="button" onClick={() => navigate("/profile")}>ユーザー画面へ</SUploadButton>
@@ -99,4 +109,30 @@ const SUploadInput = styled.input`
     border-radius: 8px;
     color: #FAFAFA;
   }
+`;
+
+const LoadingSpinner = styled.div`
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
+    height: 60px;
+    width: 60px;
+    margin: auto;
+    margin-top: 30px;
+    animation: rotation 0.6s infinite linear;
+    border-left: 6px solid black;
+    border-right: 6px solid black;
+    border-bottom: 6px solid  black;
+    border-top: 6px solid white;
+    border-radius: 100%;
+
+    @media (max-width: 599px) {
+        width: 40px;
+        height: 40px;
+    }
 `;
