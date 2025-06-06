@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import Post from './Post.tsx';
 import { PostListContext, PostType } from '../providers/PostListProvider.tsx';
 import { UserContext } from '../providers/UserProvider.tsx';
-import { getList } from '../api/Post.tsx';
+import { deletePost, getList } from '../api/Post.tsx';
 import styled from 'styled-components';
 import { getIconURL } from '../api/UserIcon.tsx';
 import axios from 'axios';
@@ -15,6 +15,7 @@ export default function PostList() {
     const [isLoading, setIsLoading] = useState(false);
 
     const getPostList = async() => {
+        setIsLoading(true);
         let posts = await getList(userInfo.token, start, 10, searchWord)
         if (!posts.length && start !== 0){
             setStart(start-10);
@@ -48,8 +49,8 @@ export default function PostList() {
                 });
             }
         }
+        new Promise(resolve => setTimeout(resolve, 300)).then(() => setIsLoading(false));
         setPostList(postList);
-        setIsLoading(false);
     }
 
     const onClickBackTenPostList = () => {
@@ -62,9 +63,26 @@ export default function PostList() {
         setStart(start + 10);
     }
 
+    const onClickDelete = (id: number) => {
+            new Promise(async (resolve) => {
+                try {
+                    await deletePost(userInfo.token, id);
+                    resolve("");
+                }
+                catch(err) {
+                    if (axios.isAxiosError(err) && err.response?.status === 404){
+                        alert("ほかの人の投稿を削除してはいけません！！！")
+                    }
+                    else{
+                        alert(err)
+                        return
+                    }
+                }
+            }).then(async () => {alert("投稿を削除しました！");await getPostList();})
+        }
+
     useEffect(() => {
         async function asyncGetPostList() {
-            setIsLoading(true);
             await getPostList();
         }
         asyncGetPostList();
@@ -72,7 +90,6 @@ export default function PostList() {
 
     useEffect(() => {
         async function asyncGetPostList() {
-            setIsLoading(true);
             await getPostList();
         }
         asyncGetPostList();
@@ -88,7 +105,7 @@ export default function PostList() {
             <br></br>
             <label>検索</label>
             <input value={searchWord} type="text" onChange={(evt) => {setSearchWord(evt.target.value);setStart(0);}}></input>
-            {isLoading ?  <>?</> : postList.map((p) => (<Post key={p.id} post={p}></Post>))}
+            {isLoading ?  <LoadingSpinner></LoadingSpinner> : postList.map((p) => (<Post key={p.id} post={p} onClickDelete={onClickDelete}></Post>))}
         </SPostList>
         </>
     )
@@ -98,6 +115,7 @@ const SPostList = styled.div`
     margin-top: 16px;
     height: calc(100vh - 86px);
     overflow-y: scroll;
+    position: relative;
 `;
 
 const SPostListButton = styled.button`
@@ -118,5 +136,31 @@ const SPostListButton = styled.button`
 
     @media (min-width: 600px) {
         width: 50px;
+    }
+`;
+
+const LoadingSpinner = styled.div`
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
+    height: 60px;
+    width: 60px;
+    margin: auto;
+    margin-top: 30px;
+    animation: rotation 0.6s infinite linear;
+    border-left: 6px solid black;
+    border-right: 6px solid black;
+    border-bottom: 6px solid  black;
+    border-top: 6px solid white;
+    border-radius: 100%;
+
+    @media (max-width: 599px) {
+        width: 40px;
+        height: 40px;
     }
 `;
