@@ -1,112 +1,80 @@
-import React, {useContext, useEffect, useState} from 'react';
-import Post from './Post.tsx';
-import { PostListContext, PostType } from '../providers/PostListProvider.tsx';
-import { UserContext } from '../providers/UserProvider.tsx';
-import { getList } from '../api/Post.tsx';
-import styled from 'styled-components';
-import { getIconURL } from '../api/UserIcon.tsx';
-import axios from 'axios';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
+import { v4 as uuidv4 } from 'uuid';
+import 'multer';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { User } from 'src/entities/user';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Equal, Repository } from 'typeorm';
+import { JwtPayload } from 'src/types/jwtpayload';
 
-export default function PostList() {
-    // ポストリストコンテキスト、ユーザーコンテキストを使用する
-    const {postList, setPostList, start, setStart} = useContext(PostListContext);
-    const {userInfo} = useContext(UserContext); 
-    const [searchWord, setSearchWord] = useState("");
+@Injectable()
+export class UserIconService {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+  private s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
+  state = uuidv4();
 
-    const getPostList = async() => {
-        const posts = await getList(userInfo.token, start, 10, searchWord)
+  async upload(payload: JwtPayload, file: Express.Multer.File) {
+    const key = `user-icons/${payload.id}/${this.state}}`;
 
-        // getListで取得したポスト配列をコンテキストに保存する
-        let postList: Array<PostType> = [];
-        if (posts) {
-            for (const p of posts) {
-                let icon_url
-                try {
-                    icon_url = await getIconURL(p.user_id, userInfo.token);
-                }
-                catch(err) {
-                    if (axios.isAxiosError(err) && err.response?.status === 500){
-                        icon_url = undefined
-                    }
-                    else{
-                        alert(err)
-                        return
-                    }
-                }
-                 postList.push({
-                    id: p.id,
-                    user_name: p.user_name,
-                    user_icon: icon_url,
-                    content: p.content,
-                    created_at: new Date(p.created_at),
-                });
-            }
-        }
-        setPostList(postList);
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      }),
+    );
+
+    // dbのアイコンを変更
+    const user = await this.userRepository.findOne({
+      where: {
+        id: Equal(payload.id),
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    user.icon_url = key;
+    await this.userRepository.save(user);
+
+    return key;
+  }
+
+  async getIconURL(id: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: Equal(id),
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    const key = user.icon_url;
+    if (!key) {
+      return;
     }
 
-    const onClickBackTenPostList = () => {
-        if (start - 10 >= 0){
-            setStart(start - 10);
-        }
-    }
-
-    const onClickNextTenPostList = async() => {
-        const posts = await getList(userInfo.token, start + 10, 10, String(searchWord)) //1000件以上の投稿をどうするか?
-        if  (posts.length){
-            setStart(start + 10);
-        }
-    }
-
-    useEffect(() => {
-        async function asyncGetPostList() {
-            await getPostList();
-            // setTimeout(async() => {
-            //     await asyncGetPostList();
-            // },10000)
-        }
-        asyncGetPostList();
-    }, [start, searchWord])
-
-    return (
-        <>
-        <SPostList>
-            <div>PostList  <span>{start+1}~{start+postList.length}件</span></div>
-            <SPostListButton onClick={()=> onClickBackTenPostList()}>&lt;</SPostListButton>
-            <SPostListButton onClick={()=> getPostList()}>↺</SPostListButton>
-            <SPostListButton onClick={()=> onClickNextTenPostList()}>&gt;</SPostListButton>
-            <br></br>
-            <label>検索</label>
-            <input value={searchWord} type="text" onChange={(evt) => {setSearchWord(evt.target.value);setStart(0);}}></input>
-            {postList.map((p) => (<Post key={p.id} post={p}></Post>))}
-        </SPostList>
-        </>
-    )
+    const url = await getSignedUrl(
+      this.s3,
+      new GetObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: key,
+      }),
+    );
+    return url;
+  }
 }
-
-const SPostList = styled.div`
-    margin-top: 16px;
-    height: calc(100vh - 86px);
-    overflow-y: scroll;
-`;
-
-const SPostListButton = styled.button`
-    background-color: #222222;
-    padding: 4px;
-    margin-top: 10px;
-    margin-left: 3px; 
-    margin-right: 3px; 
-    margin-bottom: 5px;
-    border-radius: 8px;
-    color: #FAFAFA;
-    width: 10%;
-    font-size: 12px;
-
-    @media (min-width: 600px) {
-        width: 50px;
-    }
-
-    @media (min-width: 600px) {
-        width: 50px;
-    }
-`;

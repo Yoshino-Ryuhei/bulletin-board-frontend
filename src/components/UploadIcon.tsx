@@ -49,11 +49,13 @@ const UploadIcon: React.FC = () => {
     <>
       <Header></Header>
       {userInfo.icon ? <><label>今までのユーザーアイコン</label><SUploadUserIcon src={userInfo.icon} alt={"ユーザーアイコン"}></SUploadUserIcon></> : <></>}
+      <br></br>
+      <label>変更後のユーザーアイコン</label>
+      {preview && <SUploadUserIcon src={preview} alt="preview"/>}
         
       <div>
         <SUploadInput id="fileElem" type="file" accept="image/*" onChange={handleFileChange} /><SUploadButton onClick={()=>onClickUplodaFile()}>画像を選択</SUploadButton>
-        {preview && <SUploadUserIcon src={preview} alt="preview"/>}
-        <br></br>
+         <br></br>
         <SUploadButton onClick={handleUpload}>アップロード</SUploadButton>
         {uploadedUrl && <p>アップロード成功</p>}
       </div>
@@ -76,6 +78,8 @@ const SUploadButton = styled.button`
 
 const SUploadUserIcon = styled.img`
     border-radius: 100px;
+    height: 100px;
+    width: 100px;
 
     @media (max-width: 599px) {
         width: 100px;

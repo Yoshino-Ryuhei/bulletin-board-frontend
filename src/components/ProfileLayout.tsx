@@ -48,6 +48,8 @@ const SProfileLayout  = styled.div`
 
 const SProfileLayoutUserIcon = styled.img`
     border-radius: 100px;
+    height: 100px;
+    width: 100px;
 
     @media (max-width: 599px) {
         width: 120px;

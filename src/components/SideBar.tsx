@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect } from 'react';
+import React, {useState, useContext, useEffect, useRef } from 'react';
 import { UserContext } from '../providers/UserProvider.tsx';
 import styled from 'styled-components';
 import { getList, post } from '../api/Post.tsx';
@@ -13,6 +13,7 @@ const socket = io(process.env.REACT_APP_WEBSOCKET_DOMAIN, {transports: ['websock
 export default function SideBar() {
     const [msg, setMsg] = useState("");
     const {postList, setPostList, start, setStart} = useContext(PostListContext);
+    const startRef = useRef(start);
     const { userInfo } = useContext(UserContext);
 
     const submit = (post: PostType) => {
@@ -31,6 +32,9 @@ export default function SideBar() {
             submit(newPost);
         });
     }
+    useEffect(() => {
+        startRef.current = start;
+    }, [start]);
 
     useEffect(() => {
         const sendWebSocketPost = async (post) => {
@@ -49,7 +53,9 @@ export default function SideBar() {
                 }
             }
             post.user_icon = icon_url;
-            setPostList(prev => [post, ...prev.slice(0,9)])
+            if (startRef.current === 0){
+                setPostList(prev => [post, ...prev.slice(0,9)])
+            }
         }
         socket.on("new_post", async(post) => {
             await sendWebSocketPost(post);
