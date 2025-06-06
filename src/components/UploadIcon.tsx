@@ -100,4 +100,4 @@ const SUploadInput = styled.input`
     border-radius: 8px;
     color: #FAFAFA;
   }
-`;
+`;git
