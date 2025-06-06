@@ -12,6 +12,7 @@ export default function PostList() {
     const {postList, setPostList, start, setStart} = useContext(PostListContext);
     const {userInfo} = useContext(UserContext); 
     const [searchWord, setSearchWord] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const getPostList = async() => {
         let posts = await getList(userInfo.token, start, 10, searchWord)
@@ -34,6 +35,7 @@ export default function PostList() {
                     }
                     else{
                         alert(err)
+                        setIsLoading(false);
                         return
                     }
                 }
@@ -47,6 +49,7 @@ export default function PostList() {
             }
         }
         setPostList(postList);
+        setIsLoading(false);
     }
 
     const onClickBackTenPostList = () => {
@@ -61,6 +64,7 @@ export default function PostList() {
 
     useEffect(() => {
         async function asyncGetPostList() {
+            setIsLoading(true);
             await getPostList();
         }
         asyncGetPostList();
@@ -68,6 +72,7 @@ export default function PostList() {
 
     useEffect(() => {
         async function asyncGetPostList() {
+            setIsLoading(true);
             await getPostList();
         }
         asyncGetPostList();
@@ -83,7 +88,7 @@ export default function PostList() {
             <br></br>
             <label>検索</label>
             <input value={searchWord} type="text" onChange={(evt) => {setSearchWord(evt.target.value);setStart(0);}}></input>
-            {postList.map((p) => (<Post key={p.id} post={p}></Post>))}
+            {isLoading ?  <>?</> : postList.map((p) => (<Post key={p.id} post={p}></Post>))}
         </SPostList>
         </>
     )
