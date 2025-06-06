@@ -78,11 +78,7 @@ export default function PostList() {
             <br></br>
             <label>検索</label>
             <input value={searchWord} type="text" onChange={(evt) => {setSearchWord(evt.target.value);setStart(0);}}></input>
-            {postList.map((p) => (
-                <>
-                    <Post key={p.id} post={p}></Post>
-                </>
-            ))}
+            {postList.map((p) => (<Post key={p.id} post={p}></Post>))}
         </SPostList>
         </>
     )
