@@ -49,7 +49,7 @@ export default function PostList() {
                 });
             }
         }
-        new Promise(resolve => setTimeout(resolve, 300)).then(() => setIsLoading(false));
+        new Promise(resolve => setTimeout(resolve, 1000)).then(() => setIsLoading(false));
         setPostList(postList);
     }
 
@@ -105,7 +105,8 @@ export default function PostList() {
             <br></br>
             <label>検索</label>
             <input value={searchWord} type="text" onChange={(evt) => {setSearchWord(evt.target.value);setStart(0);}}></input>
-            {isLoading ?  <LoadingSpinner></LoadingSpinner> : postList.map((p) => (<Post key={p.id} post={p} onClickDelete={onClickDelete}></Post>))}
+            {isLoading ?  <LoadingSpinner></LoadingSpinner> : <></>}
+            {postList.map((p) => (<Post key={p.id} post={p} onClickDelete={onClickDelete} opacity={isLoading ? 0 : 1}></Post>))}
         </SPostList>
         </>
     )

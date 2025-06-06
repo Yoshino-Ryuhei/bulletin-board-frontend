@@ -4,7 +4,7 @@ import { PostType } from '../providers/PostListProvider.tsx';
 import userIconSample from "../images/user_icon_sample.jpg";
 
 export default function Post(props: any) {
-    const {children, post, onClickDelete} = props;
+    const {children, post, onClickDelete, opacity} = props;
     const getDateStr = (dateObj: Date) => {
         const year = dateObj.getFullYear();
         const month = dateObj.getMonth() + 1;
@@ -34,7 +34,7 @@ export default function Post(props: any) {
 
     return(
         <>
-            <SPost>
+            <SPost opacity={opacity}>
                 <div>
                     <SUserIcon src={post.user_icon ? post.user_icon : userIconSample}  alt={"ユーザーアイコン"}></SUserIcon>
                     <SName>{post.user_name}</SName>
@@ -51,6 +51,9 @@ const SPost = styled.div`
     border-bottom: 1px solid #AAAAAA;
     text-align: left;
     padding-left: 8px;
+    position: relative;
+    ${(props) => {return(`opacity: ${props.opacity};`)}}
+    ${(props) => props.opacity ? `` : `::after{ display: block; position: absolute; width: 100%; height: 100%; content: ""; pointer-events: auto; z-index: 10;}`}
 `;
 
 const SUserIcon = styled.img`
