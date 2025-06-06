@@ -50,8 +50,7 @@ const UploadIcon: React.FC = () => {
       <Header></Header>
       {userInfo.icon ? <><label>今までのユーザーアイコン</label><SUploadUserIcon src={userInfo.icon} alt={"ユーザーアイコン"}></SUploadUserIcon></> : <></>}
       <br></br>
-      <label>変更後のユーザーアイコン</label>
-      {preview && <SUploadUserIcon src={preview} alt="preview"/>}
+      {preview && <><label>変更後のユーザーアイコン</label><SUploadUserIcon src={preview} alt="preview"/></>}
         
       <div>
         <SUploadInput id="fileElem" type="file" accept="image/*" onChange={handleFileChange} /><SUploadButton onClick={()=>onClickUplodaFile()}>画像を選択</SUploadButton>

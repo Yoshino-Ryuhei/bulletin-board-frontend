@@ -52,7 +52,8 @@ const SProfileLayoutUserIcon = styled.img`
     width: 100px;
 
     @media (max-width: 599px) {
-        width: 120px;
+        width: 80px;
+        height: 80px;
     }
 `;
 
