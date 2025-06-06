@@ -36,7 +36,6 @@ const UploadIcon: React.FC = () => {
 
     setIsUpload(true);
     const res = await uploadUserIcon(userInfo.id, userInfo.token, formData)
-    console.log(res)
     if (!res){
       alert("アップロードできませんでした...");
       setIsUpload(false);
