@@ -64,8 +64,7 @@ const UploadIcon: React.FC = () => {
       <div>
         <SUploadInput id="fileElem" type="file" accept="image/*" onChange={handleFileChange} /><SUploadButton onClick={()=>onClickUplodaFile()}>画像を選択</SUploadButton>
         <br></br>
-        <SUploadButton onClick={handleUpload}>アップロード</SUploadButton>
-        {isUplaod ? <LoadingSpinner></LoadingSpinner>:<></>}
+        <SUploadButton onClick={handleUpload}>{isUplaod ? <LoadingSpinner></LoadingSpinner>: "アップロード"}</SUploadButton>
         {uploadedUrl && <p>アップロード成功</p>}
       </div>
       <SUploadButton type="button" onClick={() => navigate("/profile")}>ユーザー画面へ</SUploadButton>
@@ -120,19 +119,13 @@ const LoadingSpinner = styled.div`
             transform: rotate(359deg);
         }
     }
-    height: 60px;
-    width: 60px;
+    width: 17px;
+    height: 17px;
     margin: auto;
-    margin-top: 30px;
     animation: rotation 0.6s infinite linear;
-    border-left: 6px solid black;
-    border-right: 6px solid black;
-    border-bottom: 6px solid  black;
-    border-top: 6px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    border-bottom: 2px solid  white;
+    border-top: 2px solid black;
     border-radius: 100%;
-
-    @media (max-width: 599px) {
-        width: 40px;
-        height: 40px;
-    }
 `;
