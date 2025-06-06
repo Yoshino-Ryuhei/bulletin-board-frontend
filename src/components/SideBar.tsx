@@ -49,7 +49,7 @@ export default function SideBar() {
                 }
             }
             post.user_icon = icon_url;
-            setPostList(prev => [post, ...prev])
+            setPostList(prev => [post, ...prev.slice(0,9)])
         }
         socket.on("new_post", async(post) => {
             await sendWebSocketPost(post);
