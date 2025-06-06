@@ -36,7 +36,7 @@ export default function Post(props: any) {
         <>
             <SPost opacity={opacity}>
                 <div>
-                    <SUserIcon src={post.user_icon ? post.user_icon : userIconSample}  alt={"ユーザーアイコン"}></SUserIcon>
+                    <SUserIcon src={post.user_icon ? post.user_icon : userIconSample}  alt={"ユーザーアイコン"} loading="lazy"></SUserIcon>
                     <SName>{post.user_name}</SName>
                     <SDate>{getDateStr(post.created_at)}</SDate>
                 </div>
